@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Toota Udd Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        
+        <div id="main-menu" class="screen">
+            <h1 class="title">Toota Udd</h1>
+            <div class="menu-buttons">
+                <button id="new-game-btn" class="menu-btn">New Game</button>
+                <button id="settings-btn" class="menu-btn">Settings</button>
+            </div>
+
+            <div id="settings-panel" style="display: none;">
+                <h3>Response Time</h3>
+                <p><span id="time-display">1.5</span> Seconds</p>
+                <input type="range" id="time-slider" min="0.5" max="3.0" step="0.1" value="1.5">
+                <button id="close-settings-btn" class="menu-btn small-btn">Close</button>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen" style="display: none;">
+            <div class="score-board">
+                <div class="score-box">
+                    <p>Score</p>
+                    <h2 id="current-score">0</h2>
+                </div>
+                <div class="score-box">
+                    <p>Best</p>
+                    <h2 id="best-score">0</h2>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div id="message-display">Hold the button to start!</div>
+                <div id="object-display" style="display: none;">
+                    <div id="emoji-display">❓</div>
+                    <h3 id="name-display">Ready?</h3>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="action-btn">HOLD FINGER HERE</button>
+            </div>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
