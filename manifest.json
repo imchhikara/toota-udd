@@ -1,4 +1,5 @@
 {
+  "id": "toota-udd-app-v1",
   "name": "Toota Udd Pro",
   "short_name": "Toota Udd",
   "description": "The classic Chidiya Udd game, now on your phone!",
@@ -18,6 +19,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshot2.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 }
