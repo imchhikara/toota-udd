@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Toota Udd Pro</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        
         <div id="main-menu" class="screen">
             <h1 class="title">Toota Udd</h1>
             <div class="menu-buttons">
@@ -48,8 +52,18 @@
                 <button id="action-btn">HOLD FINGER HERE</button>
             </div>
         </div>
-
     </div>
+    
     <script src="script.js"></script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registered!', reg))
+                .catch(err => console.error('Service Worker failed!', err));
+            });
+        }
+    </script>
 </body>
 </html>
