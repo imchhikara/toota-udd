@@ -7,6 +7,7 @@ let releasedThisRound = false;
 let currentObject = null;
 let roundTimer;
 let roundDuration = 1500; // Default 1.5 seconds
+let speechTimeout; // Safety timer for voice
 
 // DOM Elements - Menus
 const mainMenu = document.getElementById('main-menu');
@@ -27,7 +28,7 @@ const emojiEl = document.getElementById('emoji-display');
 const nameEl = document.getElementById('name-display');
 const actionBtn = document.getElementById('action-btn');
 
-// Object Database with Hindi pronunciation
+// Object Database
 const objects = [
     { name: "Parrot", hindiName: "Tota", emoji: "🦜", flies: true },
     { name: "Airplane", hindiName: "Hawai jahaj", emoji: "✈️", flies: true },
@@ -43,16 +44,64 @@ const objects = [
 
 bestScoreEl.innerText = bestScore;
 
+// --- VOICE SETUP ---
+let hindiVoice = null;
+let currentSpeech = null; 
+
+function loadVoices() {
+    const voices = window.speechSynthesis.getVoices();
+    hindiVoice = voices.find(voice => voice.lang.includes('hi')) || voices[0];
+}
+window.speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+// --- TEXT TO SPEECH ---
+function speakText(text, callback) {
+    if (!window.speechSynthesis) {
+        if (callback) callback();
+        return;
+    }
+
+    window.speechSynthesis.cancel(); 
+    clearTimeout(speechTimeout);
+
+    currentSpeech = new SpeechSynthesisUtterance(text);
+    if (hindiVoice) currentSpeech.voice = hindiVoice;
+    else currentSpeech.lang = 'hi-IN'; 
+    
+    currentSpeech.rate = 1.0; 
+    currentSpeech.volume = 1.0; 
+
+    if (callback) {
+        let callbackFired = false;
+        
+        const safeCallback = () => {
+            if (!callbackFired) {
+                callbackFired = true;
+                clearTimeout(speechTimeout);
+                callback();
+            }
+        };
+
+        currentSpeech.onend = safeCallback;
+        currentSpeech.onerror = safeCallback;
+        
+        // Failsafe: If voice gets stuck, force the game to continue after 2.5 seconds
+        speechTimeout = setTimeout(safeCallback, 2500);
+    }
+    
+    window.speechSynthesis.speak(currentSpeech);
+}
+
 // --- MENU LOGIC ---
 newGameBtn.addEventListener('click', () => {
     mainMenu.style.display = "none";
     gameScreen.style.display = "flex";
-    messageEl.innerHTML = "Hold the button to start!";
+    messageEl.innerHTML = "Hold the red button below to start!";
     objectContainer.style.display = "none";
     messageEl.style.display = "block";
     
-    // Tiny speech fix to unlock audio on mobile browsers
-    speakText(" ", () => {}); 
+    speakText(" ", null); 
 });
 
 settingsBtn.addEventListener('click', () => settingsPanel.style.display = "block");
@@ -63,30 +112,23 @@ timeSlider.addEventListener('input', (e) => {
     roundDuration = parseFloat(e.target.value) * 1000;
 });
 
-// --- TEXT TO SPEECH ---
-function speakText(text, callback) {
-    window.speechSynthesis.cancel(); // Stop any current speech
-    const speech = new SpeechSynthesisUtterance(text);
-    speech.lang = 'hi-IN'; // Set language to Hindi
-    speech.rate = 1.2; // Slightly faster for gameplay
-    
-    if (callback) {
-        speech.onend = callback; // Run function when talking finishes
-    }
-    window.speechSynthesis.speak(speech);
-}
-
 // --- GAME LOGIC ---
-actionBtn.addEventListener('pointerdown', handlePress);
-window.addEventListener('pointerup', handleRelease);
+actionBtn.addEventListener('mousedown', handlePress);
+actionBtn.addEventListener('touchstart', handlePress, {passive: false});
+
+window.addEventListener('mouseup', handleRelease);
+window.addEventListener('touchend', handleRelease);
 
 function handlePress(e) {
-    if (e) e.preventDefault();
+    if (e.cancelable) e.preventDefault(); 
+    
+    if (gameScreen.style.display === "none") return;
+
     isHolding = true;
     actionBtn.classList.add('btn-pressed');
     actionBtn.innerText = "HOLDING...";
 
-    if (!isPlaying && gameScreen.style.display === "flex") {
+    if (!isPlaying) {
         startGame();
     }
 }
@@ -111,6 +153,7 @@ function startGame() {
     updateScore();
     messageEl.style.display = "none";
     objectContainer.style.display = "block";
+    
     setTimeout(nextRound, 500);
 }
 
@@ -121,7 +164,6 @@ function nextRound() {
     const randomIndex = Math.floor(Math.random() * objects.length);
     currentObject = objects[randomIndex];
 
-    // UI Updates
     emojiEl.innerText = currentObject.emoji;
     nameEl.innerText = currentObject.name;
     
@@ -129,7 +171,6 @@ function nextRound() {
     emojiEl.offsetHeight; 
     emojiEl.style.animation = null; 
 
-    // Speak Hindi Name + Udd
     speakText(`${currentObject.hindiName} udd`);
 
     roundTimer = setTimeout(evaluateRound, roundDuration);
@@ -162,37 +203,28 @@ function triggerGameOver() {
     isPlaying = false;
     clearTimeout(roundTimer);
 
-    // Save Score
     if (score > bestScore) {
         bestScore = score;
         localStorage.setItem('tootaUddBestScore', bestScore);
         bestScoreEl.innerText = bestScore;
     }
 
-    // Hide object, show "Game Over" briefly
     objectContainer.style.display = "none";
     messageEl.style.display = "block";
     messageEl.innerHTML = `<span style="color:#e74c3c; font-weight:bold;">GAME OVER!</span>`;
 
-    // Determine voice line and return to menu when finished
-    let voiceLine = "";
+    let voiceLine = "Dhyaan se khelo"; 
     if (currentObject) {
         if (currentObject.flies) {
             voiceLine = "Bhai main udd sakta hoon";
         } else {
             voiceLine = "Waah! Mere ko bhi udd ne de";
         }
-    } else {
-        voiceLine = "Dhyaan se khelo"; // Fallback if they mess up before an object appears
     }
 
-    // Speak and then go back to Main Menu
     speakText(voiceLine, () => {
-        // This runs AFTER the talking is completely finished
         gameScreen.style.display = "none";
         mainMenu.style.display = "flex";
-        
-        // Reset button states
         isHolding = false;
         actionBtn.classList.remove('btn-pressed');
         actionBtn.innerText = "HOLD FINGER HERE";
