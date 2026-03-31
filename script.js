@@ -216,9 +216,9 @@ function triggerGameOver() {
     let voiceLine = "Dhyaan se khelo"; 
     if (currentObject) {
         if (currentObject.flies) {
-            voiceLine = "Main udd sakta hoon! Mujhe uddne do!";
+            voiceLine = "Laadle udna merko bhi aata hai !";
         } else {
-            voiceLine = "Waah! Mere ko bhi udda diya. Paaji tussi great ho!";
+            voiceLine = "Paaji aa ki kitta ? Mai hi uda dita ?";
         }
     }
 
