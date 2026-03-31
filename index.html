@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Toota Udd Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="score-board">
+            <div class="score-box">
+                <p>Score</p>
+                <h2 id="current-score">0</h2>
+            </div>
+            <div class="score-box">
+                <p>Best</p>
+                <h2 id="best-score">0</h2>
+            </div>
+        </div>
+        <div class="game-screen">
+            <div id="message-display">Hold the button to start!</div>
+            <div id="object-display" style="display: none;">
+                <div id="emoji-display">❓</div>
+                <h3 id="name-display">Ready?</h3>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="action-btn">HOLD FINGER HERE</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
